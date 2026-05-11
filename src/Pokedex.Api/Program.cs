@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using Pokedex.Api.Clients.FunTranslations;
 using Pokedex.Api.Clients.PokeApi;
 using Pokedex.Api.Configuration;
+using Pokedex.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,8 @@ builder.Services.AddHttpClient<ITranslationClient, FunTranslationsClient>((sp, h
     http.BaseAddress = new Uri(opts.BaseUrl);
     http.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds);
 });
+
+builder.Services.AddScoped<IPokemonService, PokemonService>();
 
 var app = builder.Build();
 
