@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Options;
+using Pokedex.Api.Clients.FunTranslations;
 using Pokedex.Api.Clients.PokeApi;
+using Pokedex.Api.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,19 @@ builder.Services
 builder.Services.AddHttpClient<IPokeApiClient, PokeApiClient>((sp, http) =>
 {
     var opts = sp.GetRequiredService<IOptions<PokeApiOptions>>().Value;
+    http.BaseAddress = new Uri(opts.BaseUrl);
+    http.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds);
+});
+
+builder.Services
+    .AddOptions<FunTranslationsOptions>()
+    .Bind(builder.Configuration.GetSection(FunTranslationsOptions.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddHttpClient<ITranslationClient, FunTranslationsClient>((sp, http) =>
+{
+    var opts = sp.GetRequiredService<IOptions<FunTranslationsOptions>>().Value;
     http.BaseAddress = new Uri(opts.BaseUrl);
     http.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds);
 });
